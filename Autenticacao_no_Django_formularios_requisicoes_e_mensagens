@@ -1,3 +1,179 @@
+* Criar templates para o usuario:
+
+- Remover a pasta de templates de dentro de um app.EX:
+
+receitas > templates
+
+clique com o botão direito na pasta de receita, escolha a opção 
+refactor > move directory adicione o path desejado e confirme
+
+- Fazer update nas configurações da aplicação. EX:
+
+aplicacao > settings.py
+
+ 
+TEMPLATES = [
+    {
+        ...
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        ...
+            ],
+        },
+    },
+]
+
+- crie as subpastas para novos templates.EX:
+dentro de templates, crie uma subpasta para o cadastro e para o login.
+
+EX de cadasro.hmlt:
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Preloader -->
+<div id="preloader">
+    <i class="circle-preloader"></i>
+    <img src="{% static 'img/core-img/pizza.png' %}" alt="">
+</div>
+
+{% include 'partials/_busca.html' %}
+
+{% include 'partials/_menu.html' %}
+
+<!-- ##### Contact Form Area Start ##### -->
+<div class="contact-area section-padding-0-80">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading">
+                    <h2>Criar conta</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="contact-form-area">
+                    <form action="" method="">
+                        <div class="row">
+                            <div class="col-12 col-lg-12">
+                                <label for="nome_receita"><b>Nome completo</b></label>
+                                <input type="text" class="form-control" name="nome" placeholder="Ex.:Guilherme Lima" required>
+                            </div>
+                            <div class="col-12 col-lg-12">
+                                <label for="email"><b>Email</b></label>
+                                <input type="email" class="form-control" name="email" placeholder="Ex.: guilherme@receitas.com" required>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <label for="password"><b>Senha</b></label>
+                                <input type="password" class="form-control" name="password" placeholder="Digite sua senha" required>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <label for="password2"><b>Confirmação de senha</b></label>
+                                <input type="password" class="form-control" name="password2" placeholder="Digite sua senha mais uma vez" required>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button class="btn btn-success" type="submit">Criar sua conta</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'partials/_footer.html' %}
+{% endblock %}
+
+
+EX de Login.html:
+
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Preloader -->
+<div id="preloader">
+    <i class="circle-preloader"></i>
+    <img src="{% static 'img/core-img/pizza.png' %}" alt="">
+</div>
+
+{% include 'partials/_busca.html' %}
+
+{% include 'partials/_menu.html' %}
+
+<!-- ##### Contact Form Area Start ##### -->
+<div class="contact-area section-padding-0-80">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section-heading">
+                    <h2>Login</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="contact-form-area">
+                    <form action="" method="">
+                        <div class="row">
+                            <div class="col-12 col-lg-12">
+                            <label for="email"><b>Email</b></label>
+                                <input type="text" id="email" class="form-control" name="email" placeholder="Entre com o email cadastrado">
+                            </div>
+                                <div class="col-12 col-lg-12">
+                                <label for="senha"><b>Senha</b></label>
+                                <input id="senha" type="password" class="form-control" name="senha" placeholder="Digite aqui sua senha">
+                            </div>
+                            <div class="col-12 text-center">
+                                <button class="btn btn-success" type="submit">Acessar sua conta</button>
+                                <button type="button" class="btn btn-primary" onclick="exibirCriarConta()">Ainda não tem conta? Clique aqui</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function exibirCriarConta()
+{
+     location.href = "{% url 'cadastro' %}";
+} 
+</script>
+
+{% include 'partials/_footer.html' %}
+{% endblock %}
+
+- adicione uma ligação entre a view e o template criado. EX:
+
+usuarios > views.py
+
+...
+def cadastro(request):
+    return render(request,'usuarios/cadastro.html')
+
+def login(request):
+    return render(request,'usuarios/login.html')
+
+- adicione o link para acessar o cadastro na home. EX:
+
+templates > partials > menu.html
+
+<!-- Nav Start -->
+    <div class="classynav">
+        <ul>
+            <li><a href="{% url 'index' %}">Página principal</a></li>
+            <li><a href="{% url 'cadastro' %}">Cadastro</a></li>
+            <li><a href="{% url 'login' %}">Login</a></li>
+        </ul>
+
+
+
+----------------------------------------------------------------------------
+
 * Criar métodos para as rotas:
 
 - crie uma view para cada rota.EX:
@@ -16,6 +192,20 @@ def logout(request):
 
 def dashboard(request):
     pass
+
+- indique os novos paths de url. EX:
+alurareceita > urls.py
+
+from django.contrib import admin
+from django.urls import path,include
+from django.conf import settings
+from django.conf.urls.static import
+
+urlpatterns = [
+    ...
+    path('usuarios/', include('usuarios.urls')),
+    ...
+] ...
 ----------------------------------------------------------------------------
 
 * Criar rotas para cadastros e login
