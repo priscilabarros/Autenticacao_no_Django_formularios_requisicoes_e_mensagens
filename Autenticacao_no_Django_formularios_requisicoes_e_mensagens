@@ -1,3 +1,101 @@
+* Método GET e POST:
+
+- utilizados em formulários no django para a inserção e envio de informações.
+
+- POST: utiliza quando se quer recuperar informações enviadas pela requisição
+ e processar essas informações para criar algum tipo de recurso. EX: um novo 
+usuário, uma nova receita.
+
+- GET: obter um dado de alguma requisição.
+
+EX criar um novo usuario:
+
+templates > usuarios > cadastro.html
+...
+<div class="row">
+            <div class="col-12">
+                <div class="contact-form-area">
+                    <form action="{% url 'cadastro' %}" method="POST">
+                        <div class="row">
+...
+
+usuarios > views.py
+from django.shortcuts import render,redirect
+                
+    def cadastro(request):
+        if request.method == 'POST':
+            print('Usuário criado com sucesso')
+            return redirect('login')
+        else:
+            return render(request,'usuarios/cadastro.html')     
+...  
+
+- CSRF, é uma proteção interna do django contra ataques de middleware quando usado o metodo POST. Consiste no envio e recebimento de tokens, quando um 
+post for enviado um token também deve ir junto. EX:
+
+templates > usuarios > cadastro.html
+...
+<div class="row">
+            <div class="col-12">
+                <div class="contact-form-area">
+                    <form action="{% url 'cadastro' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+...
+    
+- crie uma variavel na sua view para receber o novo usuario.
+
+Verifique uma informação no cadastro.html para retornar na view, ex: name="nome"
+
+usuarios > views.py
+
+from django.shortcuts import render,redirect
+                
+    def cadastro(request):
+        if request.method == 'POST':
+            nome = request.POST['nome']
+            email = request.POST['email']
+            senha = request.POST['password']
+            senha2 = request.POST['password2']
+            print(nome, email, senha, senha2)
+            return redirect('login')
+        else:
+            return render(request,'usuarios/cadastro.html')     
+... 
+
+- verifique se os campos preenchidos são válidos:
+
+usuarios > views.py
+
+from django.shortcuts import render,redirect
+from django.contrib.auth.models import User                
+    def cadastro(request):
+        if request.method == 'POST':
+            nome = request.POST['nome']
+            email = request.POST['email']
+            senha = request.POST['password']
+            senha2 = request.POST['password2']
+            if not nome.strip():    
+                print('O campo nome não pode ficar em branco')
+                return redirect('cadastro')
+            if not email.strip():    
+                print('O campo email não pode ficar em branco')
+                return redirect('cadastro')
+            if senha != senha2:    
+                print('As senhas não são iguais')
+                return redirect('cadastro')
+            if User.objects.filter(email=email).exists():    
+                print('Usuario já cadastrado')
+                return redirect('cadastro')
+            user = User.objects.create_user(username=nome, email=email, password=senha)
+            user.save()
+            print('Usuário cadastrado com sucesso.')
+            return redirect('login')
+        else:
+            return render(request,'usuarios/cadastro.html')     
+... 
+
+-----------------------------------------------------------------------------
 * Criar templates para o usuario:
 
 - Remover a pasta de templates de dentro de um app.EX:
