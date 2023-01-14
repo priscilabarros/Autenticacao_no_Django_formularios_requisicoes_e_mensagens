@@ -1,3 +1,119 @@
+* Menu, logout e dashboard
+
+- verificar se o usuario esta logado:
+
+menu.html
+
+<!-- Nav Start -->
+<div class="classynav">
+    <ul>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'index' %}">Página principal</a></li>
+            <li><a href="{% url 'dashboard' %}">Minhas receitas</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'index' %}">Página principal</a></li>
+            <li><a href="{% url 'cadastro' %}">Cadastro</a></li>
+            <li><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
+    </ul>
+...
+
+usuarios > views.py
+
+from django.contrib import auth
+
+def logout(request):
+    auth.logout(request)
+    return redirect('index') 
+...            
+
+- garantir que uma página só seja acessada após um login
+
+usuarios > views.py
+
+from django.shortcuts import render,redirect
+                
+    def dashboard(request):
+        if request.user.is_authenticated:
+            return render(request,'usuarios/dashboard.html')   
+        else:
+            return redirect('index')  
+... 
+
+
+
+-------------------------------------------------------------------------
+
+* Realizando o login Autenticação
+
+- importe o metodo de autenticação
+
+usuarios > views.py
+
+from django.contrib import auth
+
+def login(request):
+        if request.method == 'POST':
+            email = request.POST['email']
+            senha = request.POST['senha']
+            if email == "" or senha == "":
+                print('Os campos email e senha não podem ficar em branco')
+                return redirect('login')            
+            print(email, senha)
+            if User.objects.filter(email=email).exists():
+                nome = User.objects.filter(email=email).values_list('username', flat=True).get()
+                user = auth.authenticate(request, username=nome, password=senha)
+                if user is not None:
+                    auth.login(request, user)
+                    print('Login realizado com sucesso')
+                    return redirect('dashboard')
+        return render(request,'usuarios/login.html')     
+...              
+
+-------------------------------------------------------------------------
+* Fazer Login em uma conta criada:
+
+- Vá ao formulario de login para vincular a função de login a action do html
+
+templates > usuarios > login.html
+...
+<div class="row">
+            <div class="col-12">
+                <div class="contact-form-area">
+                    <form action="{% url 'login' %}" method="POST">
+                        <% csrf_token %>
+                        <div class="row">
+...
+
+usuarios > views.py
+
+from django.shortcuts import render,redirect
+                
+    def login(request):
+        if request.method == 'POST':
+            email = request.POST['email']
+            senha = request.POST['senha']
+            if email == "" or senha == "":
+                print('Os campos email e senha não podem ficar em branco')
+                return redirect('login')            
+            print(email, senha)
+            return redirect('dashboard')
+        return render(request,'usuarios/login.html')     
+... 
+
+Criar uma pasta de dashboard, vá em templates, clique com o botão direito e 
+crie um novo arquivo html com o nome dashboard
+    
+usuarios > views.py
+
+from django.shortcuts import render,redirect
+                
+    def dashboard(request):
+        return render(request,'usuarios/dashboard.html')     
+... 
+        
+-------------------------------------------------------------------------
 * Método GET e POST:
 
 - utilizados em formulários no django para a inserção e envio de informações.
